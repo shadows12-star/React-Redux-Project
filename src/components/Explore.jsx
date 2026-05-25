@@ -20,7 +20,7 @@ const categoryImages = {
   Sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&q=80',
 }
 
-const Home = () => {
+const Explore = () => {
   const { loading, query } = useSelector((state) => state.search)
   const dispatch = useDispatch()
 
@@ -49,60 +49,20 @@ const Home = () => {
 
        
 
-          <div className="mt-6 flex items-center justify-center gap-3 text-sm text-slate-400">
-            <span>Trending:</span>
-            {['Cyberpunk', 'Minimalism', 'Vaporwave', 'Aerial'].map(t => (
-              <button
-                key={t}
-                onClick={() => dispatch(setSearchQuery(t))}
-                className="hover:text-white transition-colors"
-              >
-                {t}
-              </button>
-            ))}
+      
+          <div className="bar">
+              <SearchBar />
           </div>
-
        
-        </div>
-      </section>
-
-      {/* Trending Categories */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-
-        <div className="flex items-end justify-between mb-3">
-          <div>
-            <h2 className="text-3xl font-bold text-white">Trending Categories</h2>
-            <p className="text-slate-400 text-sm mt-1">Explore curated collections from around the globe.</p>
-          </div>
-          <button className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1">
-            Explore all <span>→</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          {['Nature', 'Technology', 'Animals', 'Travel', 'Food', 'People', 'Architecture', 'Sports'].map((item) => (
-            <button
-              key={item}
-              disabled={loading}
-              onClick={() => { if (query !== item) dispatch(setSearchQuery(item)) }}
-              className={`relative rounded-2xl overflow-hidden h-48 group text-left transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <img
-                src={categoryImages[item]}
-                alt={item}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"/>
-              <span className="absolute bottom-4 left-4 text-white font-bold text-lg">{item}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Results */}
-         <div className="mt-8">
+          <div className="mt-8">
             <Tabs />
           </div>
+        </div>
+      </section>
+
+     
+
+      {/* Results */}
       <section className="max-w-7xl mx-auto px-6 pb-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-white">Popular Results</h2>
@@ -118,4 +78,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Explore

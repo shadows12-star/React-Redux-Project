@@ -1,155 +1,274 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { clearResults } from '../Redux/Features/searchslice'
-import {fetchPhotos, fetchVideos, fetchGifs} from '../Api/MediaApi'
-import {setLoading, setError,setSearchQueryResults} from '../Redux/Features/searchslice'
-import { useDispatch } from 'react-redux'
-import { useEffect } from 'react'
-import {addToCollection, clearCollection,   removeFromCollection} from '../Redux/Features/collectionslice'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+
+import {
+  setLoading,
+  setError,
+  setSearchQueryResults
+} from '../Redux/Features/searchslice'
+
+import {
+  fetchPhotos,
+  fetchVideos,
+  fetchGifs
+} from '../Api/MediaApi'
+
+import {
+  addToCollection
+} from '../Redux/Features/collectionslice'
+
 const ResultGrid = () => {
 
   const dispatch = useDispatch()
 
+  const {
+    query,
+    activeTab,
+    results,
+    loading,
+    error
+  } = useSelector((state) => state.search)
 
+  useEffect(() => {
 
+    let ignore = false
 
-const {query, activeTab, results, loading, error} = useSelector((state) => state.search)
+    const getdata = async () => {
 
- 
-const getdata = async () => {
-   let data=[]
-  dispatch(setLoading(true))
-  try {
+      dispatch(setLoading(true))
 
-  let response
-  if(activeTab === 'Photos'){
-    response = await fetchPhotos(query)
+      try {
 
-    data= response.map((item) => ({
-      id: item.id,
-      type: item.asset_type,
-      src: item.urls.full,
-      title: item.alt_description,
-      thumbnail: item.urls.small
-    }))
-  }
-  if(activeTab === 'Videos'){
-    response = await fetchVideos(query)
+        let response
+        let data = []
 
-    data= response.map((item) => ({
-      id: item.id,
-      type:'video',
-      src: item.url,
-      title: item.user.name||'Unknown',
-      thumbnail: item.image
-      
-      
-    }))
-  }
-  if(activeTab === 'Gifs'){
-    response = await fetchGifs(query)
+        // PHOTOS
+        if (activeTab === 'Photos') {
 
-    data= response.map((item) => ({
-      id: item.id,
-      type:'gif',
-      src: item.url,
-      title: item.title||'Unknown',
-      thumbnail: item.images.fixed_height.url
-     
-      
-      
-    }))
-  }
-  dispatch(setSearchQueryResults(data))
-  } catch (err) {
-    dispatch(setError('Failed to fetch results. Please try again.'))
-  }
+          response = await fetchPhotos(query)
 
-  console.log(data)
-  
+          data = response.map((item) => ({
+            id: item.id,
+            type: item.asset_type,
+            src: item.urls.full,
+            title: item.alt_description || 'Untitled',
+            thumbnail: item.urls.small
+          }))
 
+        }
 
-}
-useEffect(() => {
-  getdata()
-}, [activeTab, query])
-if(loading){
-  return <div>Loading...</div>
-}
-if(error){
-  return <div>Error: {error}</div>
-}
+        // VIDEOS
+        else if (activeTab === 'Videos') {
+
+          response = await fetchVideos(query)
+
+          data = response.map((item) => ({
+            id: item.id,
+            type: 'video',
+            src: item.url,
+            title: item.user?.name || 'Unknown',
+            thumbnail: item.image
+          }))
+
+        }
+
+        // GIFS
+        else if (activeTab === 'Gifs') {
+
+          response = await fetchGifs(query)
+
+          data = response.map((item) => ({
+            id: item.id,
+            type: 'gif',
+            src: item.url,
+            title: item.title || 'Unknown',
+            thumbnail: item.images.fixed_height.url
+          }))
+
+        }
+
+        if (!ignore) {
+          dispatch(setSearchQueryResults(data))
+        }
+
+      } catch (err) {
+
+        if (!ignore) {
+          dispatch(
+            setError(
+              'Failed to fetch results. Please try again.'
+            )
+          )
+        }
+
+      }
+
+    }
+
+    const timer = setTimeout(() => {
+      getdata()
+    }, 300)
+
+    return () => {
+      ignore = true
+      clearTimeout(timer)
+    }
+
+  }, [activeTab, query, dispatch])
 
   return (
-  <div className='min-h-screen bg-gray-100 p-6 mt-8 rounded-lg'>
 
-    {results.length === 0 ? (
+    <div className="min-h-96 mt-4">
 
-      <div className='flex items-center justify-center h-[60vh]'>
-        <h2 className='text-2xl font-semibold text-gray-500'>
-          No results found
-        </h2>
-      </div>
+      {/* LOADING */}
 
-    ) : (
+      {loading && (
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
 
-        {results.map((result) => (
+          <div className="w-10 h-10 border-4 border-white/10 border-t-purple-500 rounded-full animate-spin" />
 
-          <div
-            key={result.id}
-            className='bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition duration-300'
-          >
+          <p className="text-slate-500 text-sm">
+            Fetching results...
+          </p>
 
-            <div className='overflow-hidden'>
+        </div>
 
-              <img
-                src={result.thumbnail}
-                alt={result.title}
-                className='w-full h-60 object-cover hover:scale-110 transition duration-300'
-              />
+      )}
 
-            </div>
+      {/* ERROR */}
 
-            <div className='p-4'>
+      {error && (
 
-              <h3 className='text-lg font-semibold text-gray-800 truncate'>
-                {result.title}
-              </h3>
+        <div className="flex items-center justify-center h-64">
 
-              <p className='text-sm text-gray-500 capitalize mt-1'>
-                {result.type}
-              </p>
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-xl text-sm">
 
-              <a
-                href={result.src}
-                target='_blank'
-                rel='noreferrer'
-                className='inline-block mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition'
-              >
-                View
-              </a>
-             <button 
-             
-             onClick={() => {
-               dispatch(addToCollection(result))
-             }}
-             className='inline-block ml-5 mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition'>
-                Save
-              </button>
-            </div>
+            {error}
 
           </div>
 
-        ))}
+        </div>
 
-      </div>
+      )}
 
-    )}
+      {/* EMPTY */}
 
-  </div>
-)
+      {!loading && !error && results.length === 0 && (
+
+        <div className="flex flex-col items-center justify-center h-60 gap-3">
+
+          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
+
+            <svg
+              className="w-7 h-7 text-slate-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+              />
+
+            </svg>
+
+          </div>
+
+          <h2 className="text-xl font-medium text-slate-500">
+            No results found
+          </h2>
+
+          <p className="text-sm text-slate-600">
+            Try a different search term or category
+          </p>
+
+        </div>
+
+      )}
+
+      {/* RESULTS */}
+
+      {!loading && !error && results.length > 0 && (
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+
+          {results.map((result) => (
+
+            <div
+              key={result.id}
+              className="group relative rounded-2xl overflow-hidden bg-[#161b22] border border-white/5 hover:border-white/20 transition-all duration-300"
+            >
+
+              {/* IMAGE */}
+
+              <div className="overflow-hidden w-full h-52">
+
+                <img
+                  src={result.thumbnail}
+                  alt={result.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+
+              </div>
+
+              {/* TYPE */}
+
+              <span className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full capitalize font-medium border border-white/10">
+
+                {result.type}
+
+              </span>
+
+              {/* OVERLAY */}
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+
+                <h3 className="text-white text-sm font-semibold truncate mb-3">
+
+                  {result.title}
+
+                </h3>
+
+                <div className="flex gap-2">
+
+                  <a
+                    href={result.src}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 text-center text-sm py-2 bg-white text-black rounded-lg font-semibold hover:bg-white/90 transition"
+                  >
+                    View
+                  </a>
+
+                  <button
+                    onClick={() =>
+                      dispatch(addToCollection(result))
+                    }
+                    className="flex-1 text-sm py-2 bg-purple-600/80 hover:bg-purple-600 text-white rounded-lg font-semibold transition border border-purple-500/50"
+                  >
+                    Save
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      )}
+
+    </div>
+
+  )
+
 }
 
 export default ResultGrid

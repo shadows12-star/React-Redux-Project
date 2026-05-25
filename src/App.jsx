@@ -12,6 +12,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Explore from './components/Explore'
 
 const App = () => {
   return (
@@ -20,21 +21,12 @@ const App = () => {
 
    
       <div className='min-h-screen w-full bg-gradient-to-br from-purple-500 via-pink-500 to-red-400'>
-        
       <Routes>
-        <Route path='/' element={
-          <>
-          <Navbar />
-            <SearchBar />
-            <Tabs />
-            <ResultGrid />
-           <Footer />
-          </>
-        } />
-        <Route path='/home' element={<Home />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/collections' element={<Collections />} />
-      </Routes>
+  <Route path='/' element={<Explore />} />
+  <Route path='/home' element={<Home />} />
+  <Route path='/about' element={<About />} />
+  <Route path='/collections' element={<Collections />} />
+</Routes>
     
 
       </div>
