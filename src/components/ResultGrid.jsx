@@ -29,99 +29,79 @@ const ResultGrid = () => {
     error
   } = useSelector((state) => state.search)
 
-  useEffect(() => {
+  const getdata = async () => {
 
-    let ignore = false
+    let data = []
 
-    const getdata = async () => {
+    dispatch(setLoading(true))
 
-      dispatch(setLoading(true))
+    try {
 
-      try {
+      let response
 
-        let response
-        let data = []
+      // PHOTOS
+      if (activeTab === 'Photos') {
 
-        // PHOTOS
-        if (activeTab === 'Photos') {
+        response = await fetchPhotos(query)
 
-          response = await fetchPhotos(query)
-
-          data = response.map((item) => ({
-            id: item.id,
-            type: item.asset_type,
-            src: item.urls.full,
-            title: item.alt_description || 'Untitled',
-            thumbnail: item.urls.small
-          }))
-
-        }
-
-        // VIDEOS
-        else if (activeTab === 'Videos') {
-
-          response = await fetchVideos(query)
-
-          data = response.map((item) => ({
-            id: item.id,
-            type: 'video',
-            src: item.url,
-            title: item.user?.name || 'Unknown',
-            thumbnail: item.image
-          }))
-
-        }
-
-        // GIFS
-        else if (activeTab === 'Gifs') {
-
-          response = await fetchGifs(query)
-
-          data = response.map((item) => ({
-            id: item.id,
-            type: 'gif',
-            src: item.url,
-            title: item.title || 'Unknown',
-            thumbnail: item.images.fixed_height.url
-          }))
-
-        }
-
-        if (!ignore) {
-          dispatch(setSearchQueryResults(data))
-        }
-
-      } catch (err) {
-
-        if (!ignore) {
-          dispatch(
-            setError(
-              'Failed to fetch results. Please try again.'
-            )
-          )
-        }
-
+        data = response.map((item) => ({
+          id: item.id,
+          type: item.asset_type,
+          src: item.urls.full,
+          title: item.alt_description || 'Untitled',
+          thumbnail: item.urls.small
+        }))
       }
 
+      // VIDEOS
+      else if (activeTab === 'Videos') {
+
+        response = await fetchVideos(query)
+
+        data = response.map((item) => ({
+          id: item.id,
+          type: 'video',
+          src: item.url,
+          title: item.user.name || 'Unknown',
+          thumbnail: item.image
+        }))
+      }
+
+      // GIFS
+      else if (activeTab === 'Gifs') {
+
+        response = await fetchGifs(query)
+
+        data = response.map((item) => ({
+          id: item.id,
+          type: 'gif',
+          src: item.url,
+          title: item.title || 'Unknown',
+          thumbnail: item.images.fixed_height.url
+        }))
+      }
+
+      dispatch(setSearchQueryResults(data))
+
+    } catch (err) {
+
+      dispatch(
+        setError('Failed to fetch results. Please try again.')
+      )
+
     }
 
-    const timer = setTimeout(() => {
-      getdata()
-    }, 300)
+  }
 
-    return () => {
-      ignore = true
-      clearTimeout(timer)
-    }
-
-  }, [activeTab, query, dispatch])
+  useEffect(() => {
+    getdata()
+  }, [activeTab, query])
 
   return (
 
     <div className="min-h-96 mt-4">
 
       {/* LOADING */}
-
       {loading && (
 
         <div className="flex flex-col items-center justify-center h-64 gap-4">
@@ -137,7 +117,6 @@ const ResultGrid = () => {
       )}
 
       {/* ERROR */}
-
       {error && (
 
         <div className="flex items-center justify-center h-64">
@@ -153,45 +132,19 @@ const ResultGrid = () => {
       )}
 
       {/* EMPTY */}
-
       {!loading && !error && results.length === 0 && (
 
         <div className="flex flex-col items-center justify-center h-60 gap-3">
 
-          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
-
-            <svg
-              className="w-7 h-7 text-slate-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-              />
-
-            </svg>
-
-          </div>
-
           <h2 className="text-xl font-medium text-slate-500">
             No results found
           </h2>
-
-          <p className="text-sm text-slate-600">
-            Try a different search term or category
-          </p>
 
         </div>
 
       )}
 
       {/* RESULTS */}
-
       {!loading && !error && results.length > 0 && (
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -204,7 +157,6 @@ const ResultGrid = () => {
             >
 
               {/* IMAGE */}
-
               <div className="overflow-hidden w-full h-52">
 
                 <img
@@ -216,7 +168,6 @@ const ResultGrid = () => {
               </div>
 
               {/* TYPE */}
-
               <span className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full capitalize font-medium border border-white/10">
 
                 {result.type}
@@ -224,8 +175,7 @@ const ResultGrid = () => {
               </span>
 
               {/* OVERLAY */}
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
 
                 <h3 className="text-white text-sm font-semibold truncate mb-3">
 
@@ -233,7 +183,7 @@ const ResultGrid = () => {
 
                 </h3>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 pointer-events-auto">
 
                   <a
                     href={result.src}
@@ -245,9 +195,7 @@ const ResultGrid = () => {
                   </a>
 
                   <button
-                    onClick={() =>
-                      dispatch(addToCollection(result))
-                    }
+                    onClick={() => dispatch(addToCollection(result))}
                     className="flex-1 text-sm py-2 bg-purple-600/80 hover:bg-purple-600 text-white rounded-lg font-semibold transition border border-purple-500/50"
                   >
                     Save

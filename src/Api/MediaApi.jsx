@@ -2,11 +2,11 @@ import axios from 'axios';
 
 const unsplash_key = import.meta.env.VITE_UNSPLASH_KEY;
 
-export const fetchPhotos = (query) => {
+export const fetchPhotos = (query,page=1) => {
   return axios.get('https://api.unsplash.com/search/photos', {  // ✅ add return here
     params: {
       query: query,
-      page: 1,
+      page,
       per_page: 30,
     },
     headers: {
@@ -22,9 +22,9 @@ export const fetchPhotos = (query) => {
     });
 };
 
-export const fetchVideos = (query) => {
+export const fetchVideos = (query,page=1) => {
   return axios.get('https://api.pexels.com/videos/search', {  // ✅ add return here
-    params: {query: query, per_page: 30, page: 1},
+    params: {query: query, per_page: 30, page},
     headers: {Authorization: import.meta.env.VITE_PEXELS_KEY},
   })
     .then(response => {
@@ -37,12 +37,12 @@ export const fetchVideos = (query) => {
     });
 };
 
-export const fetchGifs = (query) => {
+export const fetchGifs = (query,page=1) => {
   return axios.get('https://api.giphy.com/v1/gifs/search', {  // ✅ add return here
     params: {
       q: query,
       limit: 30,
-      offset: 0,
+       offset: (page - 1) * 30,
       api_key: import.meta.env.VITE_GIPHY_KEY,
     },
   
