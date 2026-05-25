@@ -8,8 +8,15 @@ const searchSlice = createSlice({
         results: [],
         loading: false,
         error: null,
+        page: 1
     },
     reducers: {
+        prevPage: (state) => {
+            state.page = state.page > 1 ? state.page - 1 : 1;
+        },
+        setPage: (state) => {
+            state.page = state.page + 1;
+        },
         setSearchQuery: (state, action) => {
             state.query = action.payload;
         },
@@ -38,5 +45,5 @@ const searchSlice = createSlice({
     }
 });
 
-export const { setSearchQuery, setActiveTab, setSearchQueryResults, setLoading, setError, clearResults } = searchSlice.actions;
+export const { setSearchQuery, setActiveTab, setSearchQueryResults, setLoading, setError, clearResults ,setPage, prevPage} = searchSlice.actions;
 export default searchSlice.reducer;

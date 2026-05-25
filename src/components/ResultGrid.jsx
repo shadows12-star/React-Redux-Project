@@ -22,6 +22,7 @@ const ResultGrid = () => {
   const dispatch = useDispatch()
 
   const {
+    page,
     query,
     activeTab,
     results,
@@ -42,7 +43,7 @@ const ResultGrid = () => {
       // PHOTOS
       if (activeTab === 'Photos') {
 
-        response = await fetchPhotos(query)
+        response = await fetchPhotos(query, page)
 
         data = response.map((item) => ({
           id: item.id,
@@ -56,7 +57,7 @@ const ResultGrid = () => {
       // VIDEOS
       else if (activeTab === 'Videos') {
 
-        response = await fetchVideos(query)
+        response = await fetchVideos(query, page)
 
         data = response.map((item) => ({
           id: item.id,
@@ -70,7 +71,7 @@ const ResultGrid = () => {
       // GIFS
       else if (activeTab === 'Gifs') {
 
-        response = await fetchGifs(query)
+        response = await fetchGifs(query, page)
 
         data = response.map((item) => ({
           id: item.id,
@@ -95,7 +96,7 @@ const ResultGrid = () => {
 
   useEffect(() => {
     getdata()
-  }, [activeTab, query])
+  }, [activeTab, query, page])
 
   return (
 

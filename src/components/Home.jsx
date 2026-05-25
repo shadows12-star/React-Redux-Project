@@ -7,7 +7,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
-import { setSearchQuery, setError, setSearchQueryResults, setLoading } from '../Redux/Features/searchslice'
+import { setSearchQuery, setError, setSearchQueryResults, setLoading,setPage,prevPage } from '../Redux/Features/searchslice'
 
 const categoryImages = {
   Nature: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80',
@@ -21,7 +21,7 @@ const categoryImages = {
 }
 
 const Home = () => {
-  const { loading, query } = useSelector((state) => state.search)
+  const { loading, query ,page} = useSelector((state) => state.search)
   const dispatch = useDispatch()
 
   return (
@@ -74,9 +74,7 @@ const Home = () => {
             <h2 className="text-3xl font-bold text-white">Trending Categories</h2>
             <p className="text-slate-400 text-sm mt-1">Explore curated collections from around the globe.</p>
           </div>
-          <button className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1">
-            Explore all <span>→</span>
-          </button>
+  
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
@@ -98,18 +96,36 @@ const Home = () => {
           ))}
         </div>
       </section>
-
+         
       {/* Results */}
          <div className="mt-8">
             <Tabs />
           </div>
       <section className="max-w-7xl mx-auto px-6 pb-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Popular Results</h2>
-          <button className="text-sm text-slate-400 hover:text-white transition-colors">
-            View More
-          </button>
-        </div>
+       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  
+  <h2 className="text-3xl font-bold text-white">
+    Popular Results
+  </h2>
+
+  <div className="flex items-center gap-3">
+    
+    <button
+      onClick={() => dispatch(prevPage())}
+      className="px-4 py-2 rounded-xl bg-[#161b22] border border-slate-700 text-slate-300 hover:bg-[#21262d] hover:text-white transition-all duration-200"
+    >
+      Show Less
+    </button>
+
+    <button
+      onClick={() => dispatch(setPage())}
+      className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all duration-200"
+    >
+      Show More
+        </button>
+
+      </div>
+    </div>
         <ResultGrid />
       </section>
 

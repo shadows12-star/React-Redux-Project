@@ -7,7 +7,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
-import { setSearchQuery, setError, setSearchQueryResults, setLoading } from '../Redux/Features/searchslice'
+import { setSearchQuery, setError, setSearchQueryResults, setLoading,setPage,prevPage } from '../Redux/Features/searchslice'
 
 const categoryImages = {
   Nature: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80',
@@ -48,7 +48,7 @@ const Explore = () => {
           </p>
 
        
-
+          
       
           <div className="bar">
               <SearchBar />
@@ -61,15 +61,28 @@ const Explore = () => {
       </section>
 
      
-
+     
       {/* Results */}
+      
       <section className="max-w-7xl mx-auto px-6 pb-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Popular Results</h2>
-          <button className="text-sm text-slate-400 hover:text-white transition-colors">
-            View More
-          </button>
-        </div>
+        <h1 className="text-3xl font-bold text-white mb-8 ">Your Search Results</h1>
+        <div className="flex items-center gap-3">
+            
+            <button
+              onClick={() => dispatch(prevPage())}
+              className="px-4 py-2 rounded-xl bg-[#161b22] border border-slate-700 text-slate-300 hover:bg-[#21262d] hover:text-white transition-all duration-200"
+            >
+              Show Less
+            </button>
+        
+            <button
+              onClick={() => dispatch(setPage())}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all duration-200"
+            >
+              Show More
+                </button>
+        
+              </div>
         <ResultGrid />
       </section>
 
